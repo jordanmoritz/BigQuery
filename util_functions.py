@@ -1,35 +1,42 @@
-
 # coding: utf-8
 
-# In[34]:
-
-
 # Various utility functions
-def get_dataset_ids(client_name):
+def get_dataset_ids(client_name, log=False):
+    """
+    Uses the project and credentials associated with your service client to grab a list of all dataset_ids accessible.
+    Log kwarg spits out the list. Not that useful in hindsight.
+    """
+    
     dataset_list = list(client_name.list_datasets())
     
     if dataset_list:
         dataset_ids = list()
-        print(f'Datasets in project - {client_name.project}:')
-        for dataset in dataset_list:
-            print(dataset.dataset_id)
-            dataset_ids.append(dataset.dataset_id)
-            
+        
+        if log:
+            print(f'Datasets in project - {client_name.project}:')
+            for dataset in dataset_list:
+                print(dataset.dataset_id)
+                dataset_ids.append(dataset.dataset_id)
+
         return dataset_ids
 
     else:
         print(f'No datasets in {client_name.project}')        
 
-def get_table_ids(client_name, dataset):
-
-    table_list = list(client_name.list_tables(dataset))
+def get_table_ids(client_name, dataset_ref, log=False):
+    """
+    Uses service client object and dataset reference object to list all table ids in the dataset
+    Log kwarg spits it out. Can be a lot.
+    """
+    table_list = list(client_name.list_tables(dataset_ref))
 
     if table_list:
         table_ids = list()
-        print(f'Tables in {dataset.dataset_id}:')
+        
         for table in table_list:
-            print(f'{table.table_id}')
             table_ids.append(table.table_id)
+            if log:
+                print(f'{dataset_ref.dataset_id}:{table.table_id}')
 
         return table_ids
 
@@ -37,6 +44,10 @@ def get_table_ids(client_name, dataset):
         print(f'No tables in {dataset.dataset_id}')
         
 def get_dataset(client_name, dataset_id, table_ids=False):
+    """
+    Uses service client object and dataset_id to return dataset reference object.
+    Can use table_ids kwarg to also return a list of table ids via get_table_ids()
+    """
     dataset_ref = client_name.dataset(dataset_id)
     
     dataset = client_name.get_dataset(dataset_ref)
@@ -62,8 +73,11 @@ def get_dataset(client_name, dataset_id, table_ids=False):
 
     return dataset
 
-def get_table(client_name, dataset, table_id, incl_schema=False):
-    table_ref = dataset.table(table_id)
+def get_table(client_name, dataset_ref, table_id, incl_schema=False):
+    """
+    Uses dataset reference object and table_id to return table object
+    """
+    table_ref = dataset_ref.table(table_id)
     
     table = client_name.get_table(table_ref)
     
