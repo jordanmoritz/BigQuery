@@ -1,4 +1,4 @@
-# coding: utf-8
+from google.cloud import bigquery as bq
 
 # Various utility functions
 def get_dataset_ids(client_name, log=False):
